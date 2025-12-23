@@ -1,0 +1,238 @@
+/* This file is a part of Project Cappuccino; Jellyfin for Project Cafe */
+
+body {
+    background: radial-gradient(circle, #ffffff 0%, #e8f4ff 100%);
+    color: #444;
+    margin: 0;
+    padding: 20px;
+    font-family: "Segoe UI", "Ubuntu", sans-serif;
+    text-align: center;
+}
+
+a {
+    color: #0099ff;
+    text-decoration: none;
+}
+
+/* Header */
+.cafe-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 4px solid #0099ff;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.logo {
+    display: block;
+    width: 180px;
+    height: 40px;
+    mask-image: url('assets/wordmark.png');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    image-rendering: pixelated;
+    background: #000;
+    margin: 0;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wordmark {
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: -1px;
+    color: #444;
+}
+
+.wordmark .accent {
+    color: #0099ff;
+}
+
+.nav-icon {
+    background: #f0f0f0;
+    color: #444;
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 1px solid #ddd;
+    font-weight: bold;
+}
+
+/* Grid & Cards */
+.grid-container {
+    text-align: center;
+}
+
+.card {
+    display: inline-block;
+    width: 160px;
+    margin: 10px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 3px solid transparent;
+    transition: transform 0.1s ease;
+    overflow: hidden;
+    vertical-align: top;
+    color: #444 !important;
+}
+
+.card:hover, .card:active, .card:focus {
+    transform: scale(1.05);
+    border-color: #0099ff;
+    outline: none;
+}
+
+.card img {
+    display: block;
+    width: 100%;
+    height: 225px;
+    background: #eee;
+    object-fit: cover;
+}
+
+.card .title {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0;
+    padding: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Album Sections */
+.album-header { 
+    display: flex; 
+    padding: 20px; 
+    background: rgba(255,255,255,0.6); 
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.album-art { 
+    width: 150px; 
+    height: 150px; 
+    border-radius: 12px; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+}
+
+.album-details { margin-left: 20px; }
+
+/* Tracklist - Wii U Style */
+.tracklist { 
+    margin-top: 10px; 
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.track-item { 
+    padding: 15px; 
+    border-bottom: 1px solid #eee; 
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s;
+}
+
+.track-item:hover { background: #f0f9ff; }
+
+.track-item:active { 
+    background: #0099ff; 
+    color: white;
+}
+
+.track-number { color: #aaa; margin-right: 15px; display: inline-block; width: 25px; }
+
+/* Navigation & Search */
+.pagination { padding: 20px; }
+
+.page-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background: linear-gradient(to bottom, #4fc3f7 0%, #0085ff 100%);
+    color: white !important;
+    border-radius: 50px;
+    font-weight: bold;
+    margin: 0 10px;
+    box-shadow: 0 4px 0 #005bb5;
+}
+
+.page-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #005bb5;
+}
+
+.search-input {
+    background: white;
+    border: 2px solid #ddd;
+    color: #444;
+    padding: 8px 15px;
+    border-radius: 20px;
+    width: 150px;
+}
+
+/* Horizontal Scroll */
+.horizontal-scroll {
+    white-space: nowrap;
+    overflow-x: auto;
+    padding: 15px;
+    text-align: left;
+    background: rgba(255,255,255,0.3);
+    border-radius: 20px;
+}
+
+/* Music Player Bar */
+#music-player-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #444;
+    color: white;
+    padding: 12px;
+    border-top: 4px solid #0099ff;
+    z-index: 1000;
+}
+
+/* Large Interactive Buttons */
+.big-button {
+    display: block;
+    margin: 30px auto;
+    width: 85%;
+    padding: 20px;
+    background: white;
+    color: #0099ff;
+    border: 3px solid #0099ff;
+    border-radius: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 6px 0 #ddd;
+    cursor: pointer;
+}
+
+.big-button:active {
+    background: #0099ff;
+    color: white;
+    transform: translateY(3px);
+    box-shadow: none;
+}
+
+.section-title {
+    text-align: left;
+    margin-left: 20px;
+    border-left: 6px solid #0099ff;
+    padding-left: 15px;
+    font-size: 24px;
+    color: #333;
+}
+
+.cafe-footer {
+    margin-top: 60px;
+    padding: 30px;
+    color: #aaa;
+    font-size: 13px;
+}
