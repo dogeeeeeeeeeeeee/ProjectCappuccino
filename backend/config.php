@@ -1,7 +1,0 @@
-<?php
-
-$JELLYFIN_URL = "http://192.168.4.63:8096"; 
-$API_KEY = "a80c23e02890473380b1ba54207768ab";
-$USER_ID = "247df2f166f340d886cb2d4bc8b4ad05";
-
-?>
