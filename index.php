@@ -1,6 +1,20 @@
 <?php
+
 // Config - Keep this server-side only!
-include 'backend/config.php';
+$config_file = 'backend/config.php';
+
+if (!file_exists($config_file)) {
+    header('Location: configurator/index.php');
+    exit;
+}
+
+include $config_file;
+
+if (empty($JELLYFIN_URL) || empty($API_KEY) || empty($USER_ID)) {
+    header('Location: configurator/index.php');
+    exit;
+}
+
 $CONFIG = [
     'jellyfin_url' => $JELLYFIN_URL,
     'api_key' => $API_KEY,

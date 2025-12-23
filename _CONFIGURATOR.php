@@ -9,7 +9,7 @@ if (file_exists($BackendPath)) {
     $USER_ID = "";
 }
 
-if isset($_POST['subm']) {
+if (isset($_POST['subm'])) {
     $NEW_API_KEY = $_POST['api_key'];
     $NEW_USID = $_POST['user_id'];
     $NEW_JELLYFIN_URL = $_POST['jellyfin_url'];
@@ -26,7 +26,7 @@ if isset($_POST['subm']) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configurator</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="config-container">

@@ -236,3 +236,102 @@ a {
     color: #aaa;
     font-size: 13px;
 }
+
+/* Container for the Configurator */
+.config-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    text-align: left; /* Keep forms readable */
+}
+
+.config-container h1 {
+    color: #0099ff;
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+/* Form Labels */
+label {
+    display: block;
+    font-weight: bold;
+    margin: 20px 0 8px 10px;
+    color: #666;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Wii U Style Inputs */
+input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    background: #fdfdfd;
+    font-size: 16px;
+    color: #333;
+    box-sizing: border-box; /* Prevents input from overflowing */
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus {
+    border-color: #0099ff;
+    box-shadow: 0 0 10px rgba(0, 153, 255, 0.2);
+    outline: none;
+    background: white;
+}
+
+/* The Big Save Button */
+button[name="subm"] {
+    display: block;
+    width: 100%;
+    margin-top: 40px;
+    padding: 20px;
+    background: linear-gradient(to bottom, #4fc3f7 0%, #0099ff 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #005bb5;
+    transition: all 0.1s;
+}
+
+button[name="subm"]:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #005bb5;
+}
+
+/* Instructions Section */
+hr {
+    border: 0;
+    height: 1px;
+    background: #eee;
+    margin: 40px 0;
+}
+
+h2 {
+    color: #444;
+    font-size: 20px;
+    border-left: 5px solid #0099ff;
+    padding-left: 15px;
+    margin-top: 30px;
+}
+
+ol {
+    background: #f9f9f9;
+    padding: 20px 20px 20px 50px;
+    border-radius: 15px;
+    line-height: 1.8;
+    color: #555;
+}
+
+li {
+    margin-bottom: 10px;
+}
