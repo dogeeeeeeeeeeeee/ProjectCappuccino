@@ -5,9 +5,9 @@
                 <form action="index.php" method="GET" style="display:inline;">
                     <input type="hidden" name="view" value="Search">
                     <input type="text" name="q" placeholder="Search..." class="search-input">
-                    <button type="submit" class="nav-icon">🔍</button>
+                    <button type="submit" class="nav-icon"><img src="assets/search.svg" alt="search"></button>
                 </form>
-                <a href="?view=Collections" class="nav-icon">🏠</a>
+                <a href="?view=home" class="nav-icon"><img src="assets/home.svg" alt="home"></a>
             </nav>
         </div>
     </header>

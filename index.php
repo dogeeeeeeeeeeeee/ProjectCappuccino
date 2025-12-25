@@ -4,39 +4,49 @@
 $config_file = 'backend/config.php';
 
 if (!file_exists($config_file)) {
-    header('Location: configurator/index.php');
+    header('Location: _Configurator.php');
     exit;
 }
 
-include $config_file;
+require_once $config_file;
 
-if (empty($JELLYFIN_URL) || empty($API_KEY) || empty($USER_ID)) {
-    header('Location: configurator/index.php');
+if (empty($JELLYFIN_URL) || empty($API_KEY) || empty($USER_ID) || empty($ffmpeg)) {
+    header('Location: _Configurator.php');
     exit;
 }
-
-$CONFIG = [
-    'jellyfin_url' => $JELLYFIN_URL,
-    'api_key' => $API_KEY,
-    'user_id' => $USER_ID
-];
 
 $view = isset($_GET['view']) ? $_GET['view'] : 'Library';
 $type = isset($_GET['type']) ? $_GET['type'] : 'Movie';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 0;
 $limit = 24; // 24 items per page is a safe number for Wii U RAM
+
+$ua = $_SERVER['HTTP_USER_AGENT'];
+$isWiiU = (strpos($ua, 'WiiU') !== false || strpos($ua, 'NintendoBrowser') !== false);
+
+// Use this to load the right stylesheet
+$cssFile = $isWiiU ? "cafe-legacy.css" : "cafe-modern.css";
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Cappuccino -- <?php echo $view; ?></title>
-    <link rel="stylesheet" href="style.css"> </head>
+    <link rel="stylesheet" type="text/css" href="<?php echo $cssFile; ?>">
+</head>
 <body>
     <?php
     include 'components/header.php';
     ?>
 
     <div id="app">
+        <?php
+        $context = stream_context_create(['http' => ['timeout' => 5]]);
+        $response = @get_headers($CONFIG['jellyfin_url'], 1, $context);
+        if ($response === false || !preg_match('/^HTTP\/\d\.\d [123]\d{2}/', $response[0])) {
+            include 'err/server_down.php';
+            exit;
+        }
+
+        ?>
         <?php 
             // Get all available views from the views folder
             $views_dir = 'views';

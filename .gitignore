@@ -1,2 +1,4 @@
 commits.txt
 backend/config.php
+cache/*
+cache

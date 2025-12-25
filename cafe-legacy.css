@@ -1,0 +1,300 @@
+/* Cappuccino - Wii U styles */
+
+body {
+    background: #e8f4ff; /* Gradient fallback */
+    background: radial-gradient(circle, #ffffff 0%, #e8f4ff 100%);
+    color: #444;
+    margin: 0;
+    padding: 10px; /* Reduced padding for GamePad screen */
+    font-family: "Arial Unicode MS", "Arial", sans-serif; /* System-safe fonts */
+    text-align: center;
+}
+
+a {
+    color: #00adef;
+    text-decoration: none;
+}
+
+/* Header - No Flexbox for safety */
+.cafe-header {
+    background: #ffffff;
+    border-bottom: 4px solid #00adef;
+    padding: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+    overflow: hidden; /* Clearfix */
+}
+
+.logo {
+    display: block;
+    width: 180px;
+    height: 40px;
+    mask-image: url('assets/wordmark.png');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    image-rendering: pixelated;
+    background: #00adef;
+    margin: 0;
+}
+
+.wordmark {
+    float: left;
+    font-size: 24px;
+    font-weight: bold;
+    color: #444;
+}
+
+.nav-icon {
+    float: right;
+    background: #f0f0f0;
+    padding: 8px 15px;
+    border-radius: 30px; /* Rounded corners work fine */
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.nav-icon img {
+    width: 24px;
+    height: 24px;
+    display: block; /* Helps with alignment */
+}
+
+/* Album Header - Table layout is the most stable for Wii U */
+.album-header {
+    display: table;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
+    text-align: left;
+}
+
+.album-art-cell {
+    display: table-cell;
+    vertical-align: top;
+    width: 150px;
+}
+
+.album-art {
+    width: 150px;
+    height: 150px;
+    border-radius: 15px;
+}
+
+.album-details {
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 20px;
+}
+
+/* Tracklist */
+.tracklist {
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 100px; /* Space for the fixed player */
+}
+
+.track-item {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    font-size: 18px;
+    background: #fff;
+    cursor: pointer;
+}
+
+/* Cards - Use Inline-Block, not Grid */
+.card {
+    display: inline-block;
+    width: 150px;
+    margin: 8px;
+    background: #ffffff;
+    border-radius: 20px;
+    border: 2px solid #ddd;
+    vertical-align: top;
+    overflow: hidden;
+}
+
+.card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.card .title {
+    padding: 8px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* The Player Bar - Solid background, no blur */
+#music-player-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #ffffff;
+    border-top: 4px solid #00adef;
+    padding: 15px;
+    z-index: 1000;
+    height: 90px;
+}
+
+/* Controls - Simple layout */
+.player-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    background: #f2f2f2;
+    border: 2px solid #ccc;
+    font-size: 24px;
+    color: #00adef;
+    float: left;
+}
+
+/* Legacy Wii U Video Styling */
+.player-container {
+    width: 95%; /* Leave room for GamePad edges */
+    margin: 10px auto;
+}
+
+#cafePlayer {
+    width: 100%;
+    border: 4px solid #ffffff; /* Frame it like a picture */
+    border-radius: 15px;
+    background: #000;
+}
+
+.player-info {
+    text-align: left;
+    background: #ffffff; /* Solid white only */
+    border: 2px solid #e0e0e0;
+    border-top: none;
+    padding: 20px;
+    border-radius: 0 0 20px 20px;
+}
+
+.player-info h1 {
+    font-size: 22px;
+    color: #00adef;
+    margin: 0 0 10px 0;
+}
+
+.player-info p {
+    font-size: 16px;
+    line-height: 1.4;
+    color: #5a6b73;
+}
+
+.nav-btn {
+    display: block; /* Full width for easy stylus tapping */
+    text-align: center;
+    padding: 20px;
+    background: #f0f0f0;
+    color: #444 !important;
+    border: 2px solid #ccc;
+    border-radius: 40px;
+    font-weight: bold;
+    margin-top: 20px;
+    text-decoration: none;
+}
+
+.progress-area {
+    margin-left: 80px;
+    padding-top: 10px;
+}
+
+input[type="range"] {
+    width: 90%;
+    height: 20px; /* Big enough for the stylus */
+}
+
+/* Big Wii U Buttons */
+.page-btn, .big-button {
+    display: block;
+    background: #00adef;
+    color: #fff !important;
+    padding: 20px;
+    border-radius: 40px;
+    text-align: center;
+    font-weight: bold;
+    border: none;
+    box-shadow: 0 4px 0 #0077aa;
+}
+
+/* Wii U Loading Box */
+.wiiu-loading-box {
+    background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+    border: 2px solid #e0e0e0;
+    border-radius: 25px; /* Rounded corners are very Wii U */
+    padding: 40px;
+    text-align: center;
+    width: 80%;
+    margin: 10% auto;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    font-family: sans-serif;
+}
+
+#status {
+    color: #0096d2; /* The blue */
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+/* Goofy Loading Spinner */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #e0e0e0;
+    border-top: 5px solid #0096d2;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.cats-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.cat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    width: 150px;
+    text-align: center;
+    border: 2px solid #e0e0e0;
+}
+
+.cat-card.rip {
+    opacity: 0.7;
+    filter: grayscale(100%);
+    border-style: dashed;
+}
+
+.cat-avatar {
+    width: 60px;
+    height: 60px;
+    background: #4e342e;
+    color: white;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    line-height: 60px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.rip-tag {
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+}
