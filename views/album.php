@@ -20,15 +20,28 @@ $tracksData = json_decode(file_get_contents($tracksUrl), true);
 </div>
 
 <div class="tracklist" id="playlist">
-    <?php foreach ($tracksData['Items'] as $index => $track): ?>
+    <?php 
+    // Ensure $items is actually the array from Jellyfin
+    // It usually looks like $data['Items'] or just $items depending on your fetch
+    $items = isset($tracksData['Items']) ? $tracksData['Items'] : []; 
+
+    if (empty($items)) {
+        echo "<div class='error'>No tracks found. Bummer.</div>";
+    } else {
+        for ($i = 0; $i < count($items); $i++): 
+            $current = $items[$i];
+            $nextId = isset($items[$i+1]) ? $items[$i+1]['Id'] : 'null';
+            $duration = isset($current['RunTimeTicks']) ? floor($current['RunTimeTicks'] / 10000000) : 0;
+    ?>
         <div class="track-item" 
-             data-id="<?php echo $track['Id']; ?>" 
-             data-name="<?php echo addslashes($track['Name']); ?>"
-             onclick="playTrack(this)">
-            <span class="track-number"><?php echo sprintf('%02d', $index + 1); ?></span>
-            <span class="track-name"><?php echo $track['Name']; ?></span>
+            id="track-<?= $current['Id'] ?>"
+            onclick="loadTrack('<?= $current['Id'] ?>', '<?= addslashes($current['Name']) ?>', <?= $duration ?>, '<?= $nextId ?>')">
+            <?= $current['IndexNumber'] ?? ($i + 1) ?>. <?= htmlspecialchars($current['Name']) ?>
         </div>
-    <?php endforeach; ?>
+    <?php 
+        endfor; 
+    } 
+    ?>
 </div>
 
 <div id="music-player-bar">
@@ -50,63 +63,129 @@ $tracksData = json_decode(file_get_contents($tracksUrl), true);
 </div>
 
 <script type="text/javascript">
-        // USE VAR ONLY - NO CONST/LET
-        var audio = document.getElementById('audio-element');
-        var playBtn = document.getElementById('play-pause');
-        var trackDisplay = document.getElementById('current-track-name');
+    var audio = document.getElementById('audio-element');
+    var playBtn = document.getElementById('play-pause');
+    var trackDisplay = document.getElementById('current-track-name');
+    var seekBar = document.getElementById('seek-bar');
+    var poller = null;
+    var currentTrackElement = null; // CRITICAL: Fix the undefined error
+    var globalNextTrackId = null;
 
-        function playTrack(element) {
-            var id = element.getAttribute('data-id');
-            var name = element.getAttribute('data-name');
-            var streamUrl = "<?php echo $CONFIG['jellyfin_url']; ?>/Audio/" + id + "/stream.mp3?api_key=<?php echo $CONFIG['api_key']; ?>";
-            
-            trackDisplay.innerHTML = name;
-            audio.src = streamUrl;
+    function playTrack(audID) {
+        var player = audio;
+        var status = trackDisplay;
+        
+        status.innerText = "Transcoding track...";
+        
+        // 1. Ping the proxy to start the transcode
+        var checkUrl = "backend/audio_proxy.php?audID=" + audID + "&check=true";
+        
+        var poller = setInterval(function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', checkUrl, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    clearInterval(poller);
+                    status.innerText = "Playing!";
+                    // 2. Point player to the real file
+                    player.src = "backend/audio_proxy.php?audID=" + audID;
+                    player.play();
+                }
+            };
+            xhr.send();
+        }, 3000);
+    }
+
+    function loadTrack(audID, name, dur, nextId) {
+        // Reset state
+        if (poller) clearInterval(poller);
+        audio.pause();
+        trackDisplay.innerText = "Transcoding " + name + "...";
+        playBtn.innerText = "...";
+
+        var checkUrl = "backend/audio_proxy.php?audID=" + audID + "&check=true";
+        
+        poller = setInterval(function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', checkUrl, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        clearInterval(poller);
+                        trackDisplay.innerText = name;
+                        playBtn.innerText = "⏸";
+                        audio.src = "backend/audio_proxy.php?audID=" + audID;
+                        audio.play();
+                    } else if (xhr.status == 202) {
+                    } else if (xhr.status !== 425) {
+                        // Something actually went wrong
+                        trackDisplay.innerText = "Error brewing track.";
+                        clearInterval(poller);
+                    }
+                }
+            };
+            xhr.send();
+        }, 2000);
+
+        // Save the next ID for the gapless trigger
+        globalNextTrackId = (nextId !== 'null') ? nextId : null;
+
+        // Visual feedback: highlight the active track
+        document.querySelectorAll('.track-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('track-' + audID).classList.add('active');
+    }
+
+    // Play/Pause Toggle
+    playBtn.addEventListener('click', function() {
+        if (audio.paused) {
             audio.play();
-            playBtn.innerHTML = "PAUSE";
-
-            // Standard FOR loop for Wii U compatibility
-            var items = document.getElementsByClassName('track-item');
-            for (var i = 0; i < items.length; i++) {
-                items[i].style.background = "white";
-                items[i].style.color = "#444";
-            }
-
-            element.style.background = "#00adef";
-            element.style.color = "#ffffff";
+            this.innerText = "⏸";
+        } else {
+            audio.pause();
+            this.innerText = "▶";
         }
+    });
 
-        // Toggle Play/Pause
-        playBtn.onclick = function() {
-            if (audio.paused) {
-                audio.play();
-                this.innerHTML = "||";
-            } else {
-                audio.pause();
-                this.innerHTML = "▶";
+    audio.ontimeupdate = function() {
+        var dur = audio.duration && isFinite(audio.duration) ? audio.duration : audio.dataset.targetDuration;
+        
+        // Update progress bar
+        if (dur > 0) {
+            var progress = (audio.currentTime / dur) * 100;
+            document.getElementById('seek-bar').value = progress;
+            document.querySelectorAll('.time')[0].innerText = formatTime(audio.currentTime);
+
+            // GAPLESS TRIGGER: 15 seconds before the end
+            if (dur - audio.currentTime < 15 && globalNextTrackId !== null) {
+                preheatNextTrack(globalNextTrackId);
+                // CRITICAL: Set it to null so we don't start 50 FFmpeg processes 
+                // for the same song while we wait for the timer to tick down.
+                globalNextTrackId = null; 
             }
-        };
+        }
+    };
 
-        // Update Seek Bar as music plays
-        audio.ontimeupdate = function() {
-            var percentage = (audio.currentTime / audio.duration) * 100;
-            seekBar.value = percentage;
-            
-            // Update timestamps (optional)
-            // You can add logic here to format minutes:seconds
-        };
+    function preheatNextTrack(audID) {
+        // Just a "fire and forget" ping to the proxy
+        // This starts the FFmpeg process so the file is ready when the song ends
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'backend/audio_proxy.php?audID=' + audID + '&check=true', true);
+        xhr.send();
+    }
 
-        // Seek logic
-        seekBar.oninput = function() {
-            var time = audio.duration * (this.value / 100);
-            audio.currentTime = time;
-        };
+    function formatTime(s) {
+        var mins = Math.floor(s / 60);
+        var secs = Math.floor(s % 60);
+        return mins + ":" + (secs < 10 ? "0" : "") + secs;
+    }
 
-        // Autoplay next track
-        audio.onended = function() {
-            if (currentTrackElement) {
-                var nextTrack = currentTrackElement.nextElementSibling;
-                if (nextTrack) playTrack(nextTrack);
-            }
-        };
+    audio.onended = function() {
+        // Find the current active track and click the next sibling
+        var current = document.querySelector('.track-item.active');
+        var next = current ? current.nextElementSibling : null;
+        
+        if (next) {
+            next.click(); // This calls your loadTrack() function
+        }
+    };
 </script>

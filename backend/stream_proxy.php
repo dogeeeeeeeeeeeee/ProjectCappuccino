@@ -14,8 +14,21 @@ if ($vidID === '' && strtolower(PHP_SAPI) != 'cli') {
 
 $isWin = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
 
+$ua = $_SERVER['HTTP_USER_AGENT'];
+$deviceSuffix = "";
+
+if (strpos($ua, 'Nintendo 3DS') !== false) {
+    $deviceSuffix = ".3ds";
+} elseif (strpos($ua, 'Wii U') !== false) {
+    $deviceSuffix = "";
+}
+
 // Setup Paths
-$cacheDir  = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+$cacheDirBase = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+$cacheDir  = $cacheDirBase . 'vid' . DIRECTORY_SEPARATOR;
+if (!is_dir($cacheDirBase)) {
+    mkdir($cacheDirBase, 0777, true);
+}
 if (!is_dir($cacheDir)) {
     mkdir($cacheDir, 0777, true);
 }
@@ -52,7 +65,7 @@ if (strtolower(PHP_SAPI) === 'cli') {
     exit(0); // Use exit in CLI, not die with a message for better scripting
 }
 
-$cacheFile = $cacheDir . $vidID . '.mp4';
+$cacheFile = $cacheDir . $vidID . $deviceSuffix . '.mp4';
 $lockFile  = $cacheFile . '.lock';
 $scriptFile = $cacheFile . ($isWin ? '.bat' : '.sh');
 $logFile   = $cacheFile . '.log';
@@ -79,17 +92,34 @@ if (!file_exists($lockFile)) {
     $sourceUrl = $CONFIG['jellyfin_url'] . "/Videos/{$vidID}/stream?static=true&api_key=" . $CONFIG['api_key'];
     $ffmpeg = $CONFIG['ffmpeg'];
 
-    // Build the Script content based on OS
+    // Device Detection (Put this before the script builder)
+    $ua = $_SERVER['HTTP_USER_AGENT'];
+    $deviceSuffix = "";
+    $vf = "scale=1280:720"; // Default / Wii U
+    $bitrate = "-maxrate 2500k -bufsize 5000k";
+
+    if (strpos($ua, 'Nintendo 3DS') !== false) {
+        $deviceSuffix = ".3ds";
+        $vf = "scale=854:480"; // 3DS Sweet spot
+        $bitrate = "-maxrate 1000k -bufsize 2000k -r 30"; // 30fps cap is life or death
+    }
+
+    $cacheFile = $cacheDir . $vidID . $deviceSuffix . '.mp4';
+    // ... (lockFile, scriptFile, logFile setup)
+
+    // Build the Content
+    $ffmpegCmd = "\"$ffmpeg\" -i \"$sourceUrl\" -vf \"$vf\" -c:v libx264 -x264-params \"ref=1\" -profile:v baseline -level 3.0 -preset fast -crf 28 $bitrate -sn -c:a aac -ac 2 -ar 44100 -b:a 128k -movflags +faststart \"$cacheFile\" > \"$logFile\" 2>&1";
+
     if ($isWin) {
         $content = "@echo off\r\n" .
-                   "\"$ffmpeg\" -i \"$sourceUrl\" -c:v libx264 -profile:v baseline -level 3.0 -preset fast -crf 28 -sn -c:a aac -ac 2 -ar 44100 -b:a 128k -movflags +faststart \"$cacheFile\" > \"$logFile\" 2>&1\r\n" .
-                   "del \"$lockFile\"\r\n" .
-                   "del \"$scriptFile\"";
+                $ffmpegCmd . "\r\n" .
+                "del \"$lockFile\"\r\n" .
+                "del \"$scriptFile\"";
     } else {
         $content = "#!/bin/bash\n" .
-                   "\"$ffmpeg\" -i \"$sourceUrl\" -c:v libx264 -profile:v baseline -level 3.0 -preset fast -crf 28 -sn -c:a aac -ac 2 -ar 44100 -b:a 128k -movflags +faststart \"$cacheFile\" > \"$logFile\" 2>&1\n" .
-                   "rm \"$lockFile\"\n" .
-                   "rm \"$scriptFile\"";
+                $ffmpegCmd . "\n" .
+                "rm \"$lockFile\"\n" .
+                "rm \"$scriptFile\"";
     }
 
     if (file_put_contents($scriptFile, $content) === false) {

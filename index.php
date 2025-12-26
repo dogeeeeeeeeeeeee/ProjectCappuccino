@@ -21,10 +21,48 @@ $page = isset($_GET['page']) ? (int)$_GET['page'] : 0;
 $limit = 24; // 24 items per page is a safe number for Wii U RAM
 
 $ua = $_SERVER['HTTP_USER_AGENT'];
-$isWiiU = (strpos($ua, 'WiiU') !== false || strpos($ua, 'NintendoBrowser') !== false);
+
+$isWiiU = strpos($ua, 'WiiU') !== false;
+$is3DS  = strpos($ua, 'Nintendo 3DS') !== false || strpos($ua, '3DS') !== false;
+
+$isSafari = (
+    strpos($ua, 'Safari') !== false &&
+    strpos($ua, 'Chrome') === false &&
+    strpos($ua, 'Edg') === false &&
+    strpos($ua, 'OPR') === false // Opera
+);
+
+$isLegacy = false;
+
+if (
+    $isWiiU ||
+    $is3DS ||
+    $isSafari ||
+    strpos($ua, 'MSIE') !== false ||
+    strpos($ua, 'Trident/') !== false
+) {
+    $isLegacy = true;
+}
+
+// Spoof check for debugging
+if (isset($_GET['style_debug'])) {
+    if ($_GET['style_debug'] === '3ds') {
+        $is3DS = true;
+    } elseif ($_GET['style_debug'] === 'wiiu') {
+        $isWiiU = true;
+    } elseif ($_GET['style_debug'] === 'legacy') {
+        $isLegacy = true;
+    }
+}
 
 // Use this to load the right stylesheet
-$cssFile = $isWiiU ? "cafe-legacy.css" : "cafe-modern.css";
+$cssFile_a = $isLegacy ? "cafe-legacy.css" : "cafe-modern.css";
+$cssFile = $is3DS ? "cafe-legacy.css" : $cssFile_a;
+
+if ($is3DS) {
+    header('Location: https://google.com');
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html>
