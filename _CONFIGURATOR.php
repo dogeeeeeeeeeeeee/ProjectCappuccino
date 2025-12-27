@@ -18,7 +18,7 @@ if (isset($_POST['subm'])) {
     
     $config_content = "<?php\n\n\$JELLYFIN_URL = \"" . $NEW_JELLYFIN_URL . "\"; \n\$API_KEY = \"" . $NEW_API_KEY . "\";\n\$USER_ID = \"" . $NEW_USID . "\";\n\$ffmpeg = \"" . $NEW_FFPATH . "\";\n\n?>";
     file_put_contents($BackendPath, $config_content);
-    header("Location: ../index.php");
+    header("Location: index.php");
     exit();
 }
 ?>
