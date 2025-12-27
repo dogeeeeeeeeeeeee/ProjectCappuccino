@@ -1,6 +1,6 @@
 <?php
 
-$BackendPath = '../backend/config.php';
+$BackendPath = 'backend/config.php';
 if (file_exists($BackendPath)) {
     include $BackendPath; // for old stuff
 } else {
@@ -51,7 +51,7 @@ if (isset($_POST['subm'])) {
         </form>
 
         <hr>
-        
+
         <div>
             <h1>How to get everything</h1>
             <h2>Jellyfin URL</h2>

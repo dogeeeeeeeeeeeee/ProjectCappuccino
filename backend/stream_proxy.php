@@ -60,7 +60,7 @@ if (strtolower(PHP_SAPI) === 'cli') {
             echo "$mp4 is not old\n";
         }
     }
-    echo "it is done\n";
+    echo "it is done\n"; 
     echo "deleted $count sets of files\n";
     exit(0); // Use exit in CLI, not die with a message for better scripting
 }
@@ -73,10 +73,15 @@ $logFile   = $cacheFile . '.log';
 // Serve if ready
 if (file_exists($cacheFile) && !file_exists($lockFile)) {
     if ($check) die("Ready");
+    
+    // Update the timestamp so the cleanup script doesn't eat it
     touch($cacheFile); 
-    header("Content-Type: video/mp4");
-    header("Content-Length: " . filesize($cacheFile));
-    readfile($cacheFile);
+
+    // Construct the URL to the file
+    // If your proxy is in /backend/ and cache is in /cache/
+    $redirectUrl = "../cache/vid/" . basename($cacheFile);
+    
+    header("Location: " . $redirectUrl);
     exit;
 }
 
@@ -105,10 +110,17 @@ if (!file_exists($lockFile)) {
     }
 
     $cacheFile = $cacheDir . $vidID . $deviceSuffix . '.mp4';
-    // ... (lockFile, scriptFile, logFile setup)
+    $lockFile  = $cacheFile . '.lock';
+    $scriptFile = $cacheFile . ($isWin ? '.bat' : '.sh');
+    $logFile   = $cacheFile . '.log';
 
     // Build the Content
-    $ffmpegCmd = "\"$ffmpeg\" -i \"$sourceUrl\" -vf \"$vf\" -c:v libx264 -x264-params \"ref=1\" -profile:v baseline -level 3.0 -preset fast -crf 28 $bitrate -sn -c:a aac -ac 2 -ar 44100 -b:a 128k -movflags +faststart \"$cacheFile\" > \"$logFile\" 2>&1";
+    if (strpos($ua, 'Nintendo 3DS') !== false) {
+        $ffmpegCmd = "\"$ffmpeg\" -i \"$sourceUrl\" -vf \"$vf\" -c:v libx264 -x264-params \"ref=1\" -profile:v baseline -level 3.0 -preset fast -crf 28 $bitrate -sn -c:a aac -ac 2 -ar 44100 -b:a 128k \"$cacheFile\" > \"$logFile\" 2>&1";
+    } else {
+        $ffmpegCmd = "\"$ffmpeg\" -i \"$sourceUrl\" -vf \"$vf\" -c:v libx264 -x264-params \"ref=1\" -profile:v baseline -level 3.0 -preset fast -crf 28 $bitrate -sn -c:a aac -ac 2 -ar 44100 -b:a 128k -movflags +faststart \"$cacheFile\" > \"$logFile\" 2>&1";
+
+    }
 
     if ($isWin) {
         $content = "@echo off\r\n" .
